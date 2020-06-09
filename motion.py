@@ -12,14 +12,15 @@ GPIO.setmode(GPIO.BCM)
 MOTION_SENSOR_PIN = 4
 GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
 
-log_time = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-
+r.connect(config.get('rethinkdb', 'host'), config.get('rethinkdb', 'port')).repl()
 
 try:
     time.sleep(2)
     while True:
         if GPIO.input(MOTION_SENSOR_PIN):
+            print('motion sensor: detected')
 
+            log_time = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             r.db(config.get('rethinkdb', 'database')).table(config.get('rethinkdb', 'motion_table')).insert({
                 'room_id': 'room_0',
                 'date': log_time
