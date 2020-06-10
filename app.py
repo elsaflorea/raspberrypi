@@ -1,9 +1,9 @@
-from configparser import ConfigParser
+from configparser import RawConfigParser
 import RPi.GPIO as GPIO
 import mariadb
 import time
 
-config = ConfigParser()
+config = RawConfigParser()
 config.read('appconfig.ini')
 
 mdb_connection = mariadb.connect(
@@ -18,8 +18,8 @@ GPIO.setmode(GPIO.BCM)
 
 MOTION_SENSOR_PIN = 4
 LED_RED_PIN = 12
-LED_GREEN_PIN = 12
-LED_YELLOW_PIN = 12
+LED_GREEN_PIN = 16
+LED_YELLOW_PIN = 20
 
 GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
 GPIO.setup(LED_RED_PIN, GPIO.OUT)  # RED LED
