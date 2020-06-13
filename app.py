@@ -17,11 +17,13 @@ mdb_cursor = mdb_connection.cursor()
 GPIO.setmode(GPIO.BCM)
 
 MOTION_SENSOR_PIN = 4
-LED_RED_PIN = 12
-LED_GREEN_PIN = 16
-LED_YELLOW_PIN = 20
+BUZZ_PIN = 26
+LED_RED_PIN = 20
+LED_YELLOW_PIN = 16
+LED_GREEN_PIN = 12
 
 GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
+GPIO.setup(BUZZ_PIN, GPIO.OUT)  # BUzzer
 GPIO.setup(LED_RED_PIN, GPIO.OUT)  # RED LED
 GPIO.setup(LED_GREEN_PIN, GPIO.OUT)  # GREEN LED
 GPIO.setup(LED_YELLOW_PIN, GPIO.OUT)  # YELLOW LED
@@ -38,10 +40,11 @@ try:
             mdb_cursor.execute("SELECT * FROM location_stats WHERE name = 'state' ")
 
             # print content
-            row = mdb_cursor.fetchone()
-            print(row)
-            if row['value'] == 1:
+            (row_id, row_name, row_value) = mdb_cursor.fetchone()
+            print(f"row value = {row_value}")
+            if row_value == 1:
                 GPIO.output(LED_RED_PIN, GPIO.HIGH)
+                GPIO.output(BUZZ_PIN, GPIO.HIGH)
             else:
                 GPIO.output(LED_GREEN_PIN, GPIO.HIGH)
 
@@ -49,6 +52,7 @@ try:
 
         GPIO.output(LED_RED_PIN, GPIO.LOW)
         GPIO.output(LED_GREEN_PIN, GPIO.LOW)
+        GPIO.output(BUZZ_PIN, GPIO.LOW)
         time.sleep(0.1)  # loop delay, should be less than detection delay
 except:
     GPIO.cleanup()
