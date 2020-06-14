@@ -1,7 +1,9 @@
 from configparser import RawConfigParser
+from rethinkdb import r
 import RPi.GPIO as GPIO
 import mariadb
 import time
+import datetime
 
 config = RawConfigParser()
 config.read('appconfig.ini')
@@ -14,13 +16,15 @@ mdb_connection = mariadb.connect(
 )
 mdb_cursor = mdb_connection.cursor()
 
+r.connect(config.get('rethinkdb', 'host'), config.get('rethinkdb', 'port')).repl()
+
 GPIO.setmode(GPIO.BCM)
 
 MOTION_SENSOR_PIN = 4
 BUZZ_PIN = 26
-LED_RED_PIN = 20
+LED_RED_PIN = 12
 LED_YELLOW_PIN = 16
-LED_GREEN_PIN = 12
+LED_GREEN_PIN = 20
 
 GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
 GPIO.setup(BUZZ_PIN, GPIO.OUT)  # BUzzer
@@ -37,12 +41,18 @@ try:
     time.sleep(2)
     while True:
         if GPIO.input(MOTION_SENSOR_PIN):
-            mdb_cursor.execute("SELECT * FROM location_stats WHERE name = 'state' ")
+
+            log_time = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+            r.db('rpi').table(config.get('rethinkdb', 'motion_table')).insert({
+                'room_id': 'bedroom_1',
+                'date': log_time
+            }).run()
+
+            mdb_cursor.execute("SELECT value as state_value FROM location_stats WHERE name = 'state' ")
 
             # print content
-            (row_id, row_name, row_value) = mdb_cursor.fetchone()
-            print(f"row value = {row_value}")
-            if row_value == 1:
+            row = mdb_cursor.fetchone()
+            if row[0] == 1:
                 GPIO.output(LED_RED_PIN, GPIO.HIGH)
                 GPIO.output(BUZZ_PIN, GPIO.HIGH)
             else:
