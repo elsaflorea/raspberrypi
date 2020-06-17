@@ -12,7 +12,7 @@ sensor = Adafruit_DHT.DHT11
 try:
     while True:
         humidity, temperature = Adafruit_DHT.read_retry(sensor, 21)
-        print("Writing to output")
+        print(f"Writing to display temp: {temperature}, hum: {humidity}")
         display.lcd_display_string("Casa inteligenta!", 1) # Write line of text to first line of output
         display.lcd_display_string(f"Temperatura: {temperature}", 2) # Write line of text to second line of output
         time.sleep(2)                                     # Give time for the message to be read
