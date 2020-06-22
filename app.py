@@ -3,7 +3,8 @@ from rethinkdb import r
 import RPi.GPIO as GPIO
 import mariadb
 import time
-from datetime import datetime
+import datetime
+import traceback
 
 config = RawConfigParser()
 config.read('appconfig.ini')
@@ -26,7 +27,7 @@ to = ['stancatalinionut@gmail.com']
 subject = 'Miscare neautorizata detectata'
 
 fmt = '%Y-%m-%d %H:%M:%S'
-last_update = datetime.strptime(datetime.now().strftime(fmt), fmt)
+last_update = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)
 
 GPIO.setmode(GPIO.BCM)
 
@@ -62,8 +63,8 @@ try:
             # print content
             row = mdb_cursor.fetchone()
 
-            log_time = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            timeDiff = (log_time - last_date).seconds
+            log_time = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)
+            timeDiff = (log_time - last_update).seconds
 
             if timeDiff > 60 and row[0] == 1:
                 body = f"Miscare neautorizata la {log_time}"
@@ -93,5 +94,7 @@ try:
         GPIO.output(LED_GREEN_PIN, GPIO.LOW)
         GPIO.output(BUZZ_PIN, GPIO.LOW)
         time.sleep(0.1)  # loop delay, should be less than detection delay
-except:
+except  Exception as e:
+    print (e)
+    traceback.print_exc()
     GPIO.cleanup()

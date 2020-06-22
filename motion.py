@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from configparser import ConfigParser
-=======
 from configparser import RawConfigParser
->>>>>>> 9bd875c3ef13dee3c29dc5e42c6fdc234b04c6f8
 import datetime
 import time
 from rethinkdb import r
