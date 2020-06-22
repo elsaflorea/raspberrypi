@@ -5,6 +5,7 @@ import mariadb
 import time
 import datetime
 import traceback
+import smtplib
 
 config = RawConfigParser()
 config.read('appconfig.ini')
@@ -65,26 +66,23 @@ try:
 
             log_time = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)
             timeDiff = (log_time - last_update).seconds
+            
+            if row[0] == '1':
+                if timeDiff > 60:
+                    body = f"Miscare neautorizata la {log_time}"
 
-            if timeDiff > 60 and row[0] == 1:
-                body = f"Miscare neautorizata la {log_time}"
+                    email_text = f"From: {sent_from} \n To: {", ".join(to)} \n Subject: {subject} \n \n {body}"
 
-                email_text = """\
-                From: %s
-                To: %s
-                Subject: %s
+                    print(email_text)
+                    #server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                    #server.ehlo()
+                    #server.login(gmail_user, gmail_password)
+                    #server.sendmail(sent_from, to, email_text)
+                    #server.close()
 
-                %s
-                """ % (sent_from, ", ".join(to), subject, body)
-
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-                server.ehlo()
-                server.login(gmail_user, gmail_password)
-                server.sendmail(sent_from, to, email_text)
-                server.close()
-
+                    last_update = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)                            
                 GPIO.output(LED_RED_PIN, GPIO.HIGH)
-                GPIO.output(BUZZ_PIN, GPIO.HIGH)
+               # GPIO.output(BUZZ_PIN, GPIO.HIGH)
             else:
                 GPIO.output(LED_GREEN_PIN, GPIO.HIGH)
 
