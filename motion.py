@@ -4,15 +4,12 @@ from configparser import ConfigParser
 from configparser import RawConfigParser
 >>>>>>> 9bd875c3ef13dee3c29dc5e42c6fdc234b04c6f8
 import datetime
+import time
 from rethinkdb import r
 import RPi.GPIO as GPIO
-import time
+import smtplib
 
-<<<<<<< HEAD
-config = ConfigParser()
-=======
 config = RawConfigParser()
->>>>>>> 9bd875c3ef13dee3c29dc5e42c6fdc234b04c6f8
 config.read('appconfig.ini')
 
 GPIO.setmode(GPIO.BCM)
@@ -22,8 +19,6 @@ GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
 
 r.connect(config.get('rethinkdb', 'host'), config.get('rethinkdb', 'port')).repl()
 
-<<<<<<< HEAD
-=======
 mdb_connection = mariadb.connect(
     user=config.get('mariadb', 'user'),
     password=config.get('mariadb', 'password'),
@@ -32,14 +27,20 @@ mdb_connection = mariadb.connect(
 )
 mdb_cursor = mdb_connection.cursor()
 
->>>>>>> 9bd875c3ef13dee3c29dc5e42c6fdc234b04c6f8
+gmail_user = 'elsa.florea11@gmail.com'
+gmail_password = 'zcrvpwhmuwmjhicq'
+
+sent_from = gmail_user
+to = ['stancatalinionut@gmail.com']
+subject = 'Miscare neautorizata detectata'
+
+fmt = '%Y-%m-%d %H:%M:%S'
+last_update = datetime.strptime(datetime.now().strftime(fmt), fmt)
+
 try:
     time.sleep(2)
     while True:
         if GPIO.input(MOTION_SENSOR_PIN):
-<<<<<<< HEAD
-            print('motion sensor: detected')
-=======
             mdb_cursor = mdb_connection.cursor()
             mdb_cursor.execute("SELECT value as state_value FROM location_stats WHERE name = 'state' ")
 
@@ -47,9 +48,27 @@ try:
             row = mdb_cursor.fetchone()
 
             print(row)
->>>>>>> 9bd875c3ef13dee3c29dc5e42c6fdc234b04c6f8
 
             log_time = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+            timeDiff = (log_time - last_date).seconds
+
+            if timeDiff > 60 and row[0] == 1:
+                body = f"Miscare neautorizata la {log_time}"
+
+                email_text = """\
+                From: %s
+                To: %s
+                Subject: %s
+
+                %s
+                """ % (sent_from, ", ".join(to), subject, body)
+
+                server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                server.ehlo()
+                server.login(gmail_user, gmail_password)
+                server.sendmail(sent_from, to, email_text)
+                server.close()
+
             r.db(config.get('rethinkdb', 'database')).table(config.get('rethinkdb', 'motion_table')).insert({
                 'room_id': 'room_0',
                 'date': log_time
@@ -59,9 +78,3 @@ try:
         time.sleep(0.1) #loop delay, should be less than detection delay
 except:
     GPIO.cleanup()
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 9bd875c3ef13dee3c29dc5e42c6fdc234b04c6f8
