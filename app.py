@@ -14,7 +14,6 @@ mdb_connection = mariadb.connect(
     database=config.get('mariadb', 'database'),
     host=config.get('mariadb', 'host'),
 )
-mdb_cursor = mdb_connection.cursor()
 
 r.connect(config.get('rethinkdb', 'host'), config.get('rethinkdb', 'port')).repl()
 
@@ -47,7 +46,8 @@ try:
                 'room_id': 'bedroom_1',
                 'date': log_time
             }).run()
-
+            
+            mdb_cursor = mdb_connection.cursor()
             mdb_cursor.execute("SELECT value as state_value FROM location_stats WHERE name = 'state' ")
 
             # print content
