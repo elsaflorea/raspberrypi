@@ -47,11 +47,14 @@ try:
                 'room_id': 'bedroom_1',
                 'date': log_time
             }).run()
-
+            
+            # mdb_cursor = mdb_connection.cursor()
             mdb_cursor.execute("SELECT value as state_value FROM location_stats WHERE name = 'state' ")
 
             # print content
             row = mdb_cursor.fetchone()
+            print(row[0])
+
             if row[0] == 1:
                 GPIO.output(LED_RED_PIN, GPIO.HIGH)
                 GPIO.output(BUZZ_PIN, GPIO.HIGH)
