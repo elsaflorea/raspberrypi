@@ -3,7 +3,7 @@ from rethinkdb import r
 import RPi.GPIO as GPIO
 import mariadb
 import time
-import datetime
+from datetime import datetime
 
 config = RawConfigParser()
 config.read('appconfig.ini')
@@ -57,8 +57,7 @@ try:
                 'room_id': 'bedroom_1',
                 'date': log_time
             }).run()
-            
-            # mdb_cursor = mdb_connection.cursor()
+
             mdb_cursor.execute("SELECT value as state_value FROM location_stats WHERE name = 'state' ")
             # print content
             row = mdb_cursor.fetchone()
