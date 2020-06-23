@@ -20,11 +20,11 @@ mdb_cursor = mdb_connection.cursor()
 
 r.connect(config.get('rethinkdb', 'host'), config.get('rethinkdb', 'port')).repl()
 
-gmail_user = 'elsa.florea11@gmail.com'
-gmail_password = 'zcrvpwhmuwmjhicq'
+gmail_user = config.get('gmail', 'user')
+gmail_password = config.get('gmail', 'password')
 
 sent_from = gmail_user
-to = ['stancatalinionut@gmail.com']
+to = [config.get('gmail', 'to')]
 subject = 'Miscare neautorizata detectata'
 
 fmt = '%Y-%m-%d %H:%M:%S'
@@ -66,7 +66,7 @@ try:
 
             log_time = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)
             timeDiff = (log_time - last_update).seconds
-            
+
             if row[0] == '1':
                 if timeDiff > 60:
                     body = f"Miscare neautorizata la {log_time}"
@@ -80,7 +80,7 @@ try:
                     #server.sendmail(sent_from, to, email_text)
                     #server.close()
 
-                    last_update = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)                            
+                    last_update = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)
                 GPIO.output(LED_RED_PIN, GPIO.HIGH)
                # GPIO.output(BUZZ_PIN, GPIO.HIGH)
             else:
