@@ -71,14 +71,14 @@ try:
                 if timeDiff > 60:
                     body = f"Miscare neautorizata la {log_time}"
 
-                    email_text = f"From: {sent_from} \n To: {", ".join(to)} \n Subject: {subject} \n \n {body}"
+                    email_text = f'From: {sent_from} \n To: {", ".join(to)} \n Subject: {subject} \n \n {body}'
 
                     print(email_text)
-                    #server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-                    #server.ehlo()
-                    #server.login(gmail_user, gmail_password)
-                    #server.sendmail(sent_from, to, email_text)
-                    #server.close()
+                    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                    server.ehlo()
+                    server.login(gmail_user, gmail_password)
+                    server.sendmail(sent_from, to, email_text)
+                    server.close()
 
                     last_update = datetime.datetime.strptime(datetime.datetime.now().strftime(fmt), fmt)
                 GPIO.output(LED_RED_PIN, GPIO.HIGH)
